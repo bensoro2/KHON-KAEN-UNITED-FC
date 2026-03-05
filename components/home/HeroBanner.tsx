@@ -37,7 +37,7 @@ export default function HeroBanner() {
 
         {/* Tagline */}
         <p className="mt-6 text-gray-300 text-lg font-heading tracking-wide">
-          งูเห่าสายฟ้า — The Cobra Strike
+          จงอางผยอง — The Cobra Strike
         </p>
 
         {/* CTA Buttons */}

@@ -36,7 +36,7 @@ export default async function AboutPage() {
             <Image src="/logo.png" alt="Khon Kaen United" fill className="object-contain" />
           </div>
           <h1 className="font-display text-5xl text-white">KHON KAEN UNITED FC</h1>
-          <p className="text-[#C9A84C] font-heading tracking-widest mt-1">{s('nickname') || 'งูเห่าสายฟ้า'}</p>
+          <p className="text-[#C9A84C] font-heading tracking-widest mt-1">{s('nickname') || 'จงอางผยอง'}</p>
         </div>
       </div>
 

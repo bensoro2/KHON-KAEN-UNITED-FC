@@ -35,7 +35,7 @@ export default function Footer() {
             </div>
             <p className="text-sm text-gray-500 leading-relaxed">
               สโมสรฟุตบอลขอนแก่น ยูไนเต็ด<br />
-              ร่วมเป็นส่วนหนึ่งของงูเห่าสายฟ้า
+              ร่วมเป็นส่วนหนึ่งของจงอางผยอง
             </p>
             {/* Social */}
             <div className="flex items-center gap-3">

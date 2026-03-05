@@ -101,7 +101,7 @@ export default async function HomePage() {
             เป็นส่วนหนึ่งของพวกเรา
           </h2>
           <p className="text-red-100 mb-8 font-heading">
-            ติดตามทุกความเคลื่อนไหวของงูเห่าสายฟ้า
+            ติดตามทุกความเคลื่อนไหวของจงอางผยอง
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
