@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Plus, Pencil } from 'lucide-react'
 import DeleteButton from '@/components/admin/DeleteButton'
+import MatchLogoCell from '@/components/admin/MatchLogoCell'
 
 export default async function AdminMatchesPage() {
   const supabase = await createClient()
@@ -26,7 +27,8 @@ export default async function AdminMatchesPage() {
       </div>
 
       <div className="bg-[#141414] border border-[#2A2A2A] rounded-sm overflow-hidden">
-        <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-5 py-3 bg-[#1E1E1E] border-b border-[#2A2A2A] text-xs text-gray-500 font-heading uppercase tracking-wider">
+        <div className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 px-5 py-3 bg-[#1E1E1E] border-b border-[#2A2A2A] text-xs text-gray-500 font-heading uppercase tracking-wider">
+          <span>โลโก้</span>
           <span>แมตช์</span>
           <span>วันที่</span>
           <span>ผล</span>
@@ -45,8 +47,9 @@ export default async function AdminMatchesPage() {
           return (
             <div
               key={m.id}
-              className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-5 py-3.5 border-b border-[#2A2A2A] last:border-b-0 items-center hover:bg-[#1A1A1A] transition-colors"
+              className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 px-5 py-3.5 border-b border-[#2A2A2A] last:border-b-0 items-center hover:bg-[#1A1A1A] transition-colors"
             >
+              <MatchLogoCell matchId={m.id} logoUrl={m.opponent_logo} opponentName={m.opponent} />
               <p className="text-sm text-white font-heading">
                 {m.is_home ? 'KKU' : m.opponent} vs {m.is_home ? m.opponent : 'KKU'}
                 <span className="ml-2 text-xs text-gray-600">{m.is_home ? '(เหย้า)' : '(เยือน)'}</span>

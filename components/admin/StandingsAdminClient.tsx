@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Standing } from '@/lib/supabase/types'
-import { Plus, Trash2, Save } from 'lucide-react'
+import { Plus, Trash2, Save, Upload } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface Props {
   initialData: Standing[]
@@ -24,6 +25,61 @@ const EMPTY_ROW = (): Omit<Standing, 'id'> => ({
   sort_order: 0,
 })
 
+function LogoCell({ logoUrl, onUpload }: { logoUrl: string | null; onUpload: (url: string) => void }) {
+  const [uploading, setUploading] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) return
+    if (file.size > 2 * 1024 * 1024) return
+
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split('.').pop()
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const { error } = await supabase.storage
+        .from('uploads')
+        .upload(`logos/${filename}`, file, { upsert: true })
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(`logos/${filename}`)
+        onUpload(publicUrl)
+      }
+    } finally {
+      setUploading(false)
+      if (inputRef.current) inputRef.current.value = ''
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-center">
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={uploading}
+        className="relative w-9 h-9 rounded-full overflow-hidden bg-[#2A2A2A] hover:ring-2 hover:ring-[#B91C1C] transition-all flex items-center justify-center group"
+        title="คลิกเพื่ออัพโหลดโลโก้"
+      >
+        {uploading ? (
+          <div className="w-4 h-4 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+        ) : logoUrl ? (
+          <>
+            <Image src={logoUrl} alt="logo" fill className="object-contain p-0.5" unoptimized />
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Upload size={12} className="text-white" />
+            </div>
+          </>
+        ) : (
+          <Upload size={14} className="text-gray-500 group-hover:text-gray-300 transition-colors" />
+        )}
+      </button>
+      <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+    </div>
+  )
+}
+
 export default function StandingsAdminClient({ initialData }: Props) {
   const [rows, setRows] = useState<(Standing | (Omit<Standing, 'id'> & { id?: string }))[]>(initialData)
   const [saving, setSaving] = useState(false)
@@ -33,8 +89,8 @@ export default function StandingsAdminClient({ initialData }: Props) {
     setRows([...rows, EMPTY_ROW()])
   }
 
-  function updateRow(index: number, field: string, value: string | number) {
-    setRows(rows.map((r, i) => i === index ? { ...r, [field]: value } : r))
+  function updateRow(index: number, field: string, value: string | number | null) {
+    setRows(prev => prev.map((r, i) => i === index ? { ...r, [field]: value } : r))
   }
 
   async function deleteRow(index: number) {
@@ -103,7 +159,7 @@ export default function StandingsAdminClient({ initialData }: Props) {
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-[#1E1E1E] border-b border-[#2A2A2A]">
-              {['#', 'ชื่อทีม', 'ซีซั่น', 'แข่ง', 'ชนะ', 'เสมอ', 'แพ้', 'GF', 'GA', 'คะแนน', ''].map((h) => (
+              {['#', 'โลโก้', 'ชื่อทีม', 'ซีซั่น', 'แข่ง', 'ชนะ', 'เสมอ', 'แพ้', 'GF', 'GA', 'คะแนน', ''].map((h) => (
                 <th key={h} className="px-3 py-3 text-left text-xs text-gray-500 font-heading uppercase tracking-wider whitespace-nowrap">
                   {h}
                 </th>
@@ -114,6 +170,12 @@ export default function StandingsAdminClient({ initialData }: Props) {
             {rows.map((row, i) => (
               <tr key={i} className="bg-[#141414] hover:bg-[#1A1A1A] transition-colors">
                 <td className="px-3 py-2 text-gray-500 text-xs font-heading">{i + 1}</td>
+                <td className="px-3 py-2 w-14">
+                  <LogoCell
+                    logoUrl={row.logo_url}
+                    onUpload={(url) => updateRow(i, 'logo_url', url)}
+                  />
+                </td>
                 <td className="px-3 py-2 min-w-[160px]">
                   <input value={row.team_name} onChange={(e) => updateRow(i, 'team_name', e.target.value)} className={cellClass} placeholder="ชื่อทีม" />
                 </td>
